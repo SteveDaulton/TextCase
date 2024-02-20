@@ -3,7 +3,7 @@
 Uses temporary file to allow processing files larger than RAM.
 """
 
-# import argparse
+import argparse
 import shutil
 import tempfile
 from pathlib import Path
@@ -75,7 +75,6 @@ def to_sentence_case(txt: str, continue_sentence: bool) -> tuple[str, bool]:
         True if mid-sentence else False.
 
     """
-    print(txt, len(txt))
     completed_sentence = False
     try:
         if txt.strip()[-1] == '.':
@@ -99,13 +98,14 @@ def manual_config():
     Called when app runs without commandline options.
     """
     print("Utility for converting a text file to upper or lower case.")
-    print("(For command line options, run with '-h' switch.)\n")
+    print("(For command line options, run with '-h' switch.)")
     print("File names may be relative or fully qualified.")
     print("Enter 'Q' to Quit.\n")
 
     options = {"u": "upper", "l": "lower", "t": "title", "s": "sentence"}
-    case_option = input_choice("Case (upper, lower, title, sentence [U/L/T/S]",
-                               str(options.keys()))
+    case_option = input_choice(
+        "Change case to upper[U], lower[L], title[T], sentence[S]",
+        str(str(options.keys())))
     case_description = options[case_option]
 
     input_file = input_file_prompt()
@@ -114,5 +114,52 @@ def manual_config():
     convert_case(input_file, case_option)
 
 
+def validate_options(args):
+    """There must be no arguments, or filepath and one format specifier."""
+    format_specifier = any([args.uppercase, args.lowercase,
+                            args.title_case, args.sentence_case])
+    if args.filepath and not format_specifier:
+        parser.error(
+            "at least one format option must be specified when "
+            "specifying file path.")
+    elif format_specifier and not args.filepath:
+        parser.error(
+            "File path must be passed when using command-line options.")
+
+
 if __name__ == '__main__':
-    manual_config()
+    usage_msg = ("[filepath [-u UPPERCASE | -l LOWERCASE | "
+                 "-t TITLECASE | -s SENTENCECASE]]")
+
+    parser = argparse.ArgumentParser(
+        prog='textcase',
+        description='Change the case of text in a file.'
+        'Run without arguments for interactive mode.',
+        usage=f'%(prog)s {usage_msg}')
+
+    group = parser.add_argument_group(
+        'Arguments',
+        'Requires filepath + one other argument.')
+    group.add_argument('filepath', nargs='?',
+                       help='Path to the text file')
+    exclusive_group = group.add_mutually_exclusive_group()
+    exclusive_group.add_argument('-u', '--uppercase',
+                                 action='store_true',
+                                 help='Convert text to uppercase')
+    exclusive_group.add_argument('-l', '--lowercase',
+                                 action='store_true',
+                                 help='Convert text to lowercase')
+    exclusive_group.add_argument('-t', '--title-case',
+                                 action='store_true',
+                                 help='Convert text to title case')
+    exclusive_group.add_argument('-s', '--sentence-case',
+                                 action='store_true',
+                                 help='Convert text to sentence case')
+    args = parser.parse_args()
+
+    validate_options(args)
+
+    if args.filepath:
+        print(args)
+    else:
+        manual_config()

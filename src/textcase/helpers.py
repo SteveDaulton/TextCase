@@ -43,7 +43,6 @@ def input_choice(message: str, *args: str) -> str:
         Lower-case user choice.
     """
     choices = [choice.lower() for choice in args]
-    print(choices)
     while True:
         user_input = get_user_input_or_quit(message).lower()
         if user_input in str(choices):
