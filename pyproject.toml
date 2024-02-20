@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "textcase"
+version = "0.1.0"
+description = "Convert case in text files. Supports lowercase, uppercase, title-case and"
+authors = ["Steve Daulton"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+poetry = "^1.7.1"
+flake8 = "^7.0.0"
+pytest = "pylint"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
